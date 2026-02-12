@@ -1,7 +1,6 @@
 <script>
 (function () {
   const ENDPOINT = "https://twdsjzrajfvjovrphucn.supabase.co/functions/v1/mkt-identify";
-  const FORM_ID = "fs-blog-subscribe";
   const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
   function pickUuid(keys) {
@@ -35,7 +34,6 @@
   function send(payload) {
     const body = JSON.stringify(payload);
 
-    // Más robusto si hay redirect post-submit
     if (navigator.sendBeacon) {
       const blob = new Blob([body], { type: "application/json" });
       return navigator.sendBeacon(ENDPOINT, blob);
@@ -53,10 +51,18 @@
     "submit",
     function (e) {
       const form = e.target;
-      if (!form || form.id !== FORM_ID) return;
 
-      const emailEl = form.querySelector('input[type="email"], input[name*="mail" i]');
-      const email = emailEl && emailEl.value ? String(emailEl.value).trim().toLowerCase() : "";
+      // 👉 cambio clave: no filtramos por ID (Framer no expone bien los forms)
+      if (!form) return;
+
+      const emailEl = form.querySelector(
+        'input[type="email"], input[name*="mail" i]'
+      );
+
+      const email = emailEl && emailEl.value
+        ? String(emailEl.value).trim().toLowerCase()
+        : "";
+
       if (!email) return;
 
       const visitor_id = getVisitorId();
